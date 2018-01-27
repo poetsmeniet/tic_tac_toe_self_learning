@@ -1,7 +1,7 @@
-client
+client (human, automaton)
   |
   ⌄
-Server
+Server (gamekeeper)
   ⌃
   |
-Client
+client (human, automaton)
