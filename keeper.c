@@ -12,37 +12,45 @@
  */
 typedef struct gameArrayInt{
     char game[10];
+    char playerX;
+    char playerO;
+    char playerTurn;
 }gInt;
 
-struct gameArrayInt *initGame(char *name);
+struct gameArrayInt *initGame(char *shmName);
 
 int main(void)
 {
-    char name[] = "/gameState";
+    char shmName[] = "/gameState";
 
-    struct gameArrayInt *p = initGame(name);
-    sleep(5);
+    struct gameArrayInt *p = initGame(shmName);
 
-    memcpy(p->game, "*O*******\0", 10);
-    printf("p->game = %s\n", p->game);
+    //parse moves
+    while(1){
+        //temporarily use usleep in loop
+        printf("gameState: %s\n", p->game);
+        printf("PlayerX: %c\n", p->playerX);
+        printf("PlayerO: %c\n", p->playerO);
+        printf("it is Player %c's turn\n\n", p->playerTurn);
 
-    sleep(5);
+        usleep(500000);
+    }
 
-    munmap(&p, sizeof(int));
+    munmap(&p, sizeof(struct gameArrayInt));
 
-    shm_unlink(name);
+    shm_unlink(shmName);
 
     return 0;
 }
 
 /* Returns pointer to shared memory game state array */
-struct gameArrayInt *initGame(char *name)
+struct gameArrayInt *initGame(char *shmName)
 {
-    int smfd = shm_open (name, O_RDWR | O_CREAT, 0660); 
+    int smfd = shm_open (shmName, O_RDWR | O_CREAT, 0660); 
 
     if(smfd == -1){
         perror("Unable to open shared memory\n");
-        shm_unlink(name);
+        shm_unlink(shmName);
         return NULL;
     }
 
@@ -54,7 +62,7 @@ struct gameArrayInt *initGame(char *name)
 
     if(p < 0){
         perror("mmap failed.\n");
-        munmap(&p, sizeof(int));
+        munmap(&p, sizeof(struct gameArrayInt));
         return NULL;
     }
 
@@ -62,5 +70,9 @@ struct gameArrayInt *initGame(char *name)
     memcpy(p->game, "*********\0", 10);
     printf("p->game = %s\n", p->game);
 
+    //Initialise players to none
+    p->playerX = '*';
+    p->playerO = '*';
+    p->playerTurn = 'X';
     return p;
 }
