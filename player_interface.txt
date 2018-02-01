@@ -1,4 +1,4 @@
-Player 1: O
+Player 1: X
 
 3    X | O | O
     ---|---|---
@@ -9,7 +9,7 @@ Player 1: O
      a   b   c
 
 
-Player 2: X
+Player 2: O
 
 1    X | X | X
     ---|---|---
