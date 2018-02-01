@@ -10,6 +10,8 @@ typedef struct gameArrayInt{
     char playerX;
     char playerO;
     char playerTurn;
+    char nextMove[3];
+    int sem;
 }gInt;
 
 int main(void)
@@ -48,13 +50,21 @@ int main(void)
 
     /* Main loop */
     while(1){
-        printf("is %c == %c?\n", p->playerTurn, player);
+        char nextMove[10];
         //Turn?
-        if(p->playerTurn == player){
+        if(p->playerTurn == player && p->sem){
+           // printf("is %c == %c?\n", p->playerTurn, player);
+            printf("gameState: %s\n", p->game);
             printf("Please make a move:\n?>");
-            sleep(10);
+            fgets(nextMove, 10, stdin);
+            p->sem = 0;
+            memcpy(p->nextMove, nextMove, 3);
+            p->nextMove[2] = '\0';
+        }else{
+            printf("gameState: %s\n", p->game);
         }
-        sleep(1);
+        //sleep(1);
+        usleep(50000);
     }
 
     munmap(&p, sizeof(struct gameArrayInt));
