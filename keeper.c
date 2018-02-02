@@ -20,7 +20,8 @@ typedef struct gameArrayInt{
 }gInt;
 
 struct gameArrayInt *initGame(char *shmName);
-void parseMove(gInt *p);
+int parseMove(gInt *p);
+void newGame(gInt *p);
 
 int main(void)
 {
@@ -81,19 +82,12 @@ struct gameArrayInt *initGame(char *shmName)
     }
 
     //Init new gameState
-    memcpy(p->game, "*********\0", 10);
-    printf("p->game = %s\n", p->game);
+    newGame(p);
 
-    //Initialise players to none
-    p->playerX = '*';
-    p->playerO = '*';
-    p->playerTurn = 'X';
-    memcpy(p->nextMove, "* \0", 3);
-    p->sem = 1;
     return p;
 }
 
-void parseMove(gInt *p)
+int parseMove(gInt *p)
 {
     char col = p->nextMove[0];
     int row = p->nextMove[1] - '0';
@@ -131,7 +125,45 @@ void parseMove(gInt *p)
         validMv = 0;
         
     //Does this make a winner?
+    int i;
+    int X = 0;
+    int O = 0;
+    char Xmvs[10];
+    char Omvs[10];
 
+    for(i = 0; i < 10; i++){
+        if(p->game[i] == 'X'){
+            Xmvs[X] = i + '0';
+            X++;
+        }else if(p->game[i] == 'O'){
+            Omvs[O] = i + '0';
+            O++;
+        }
+    }
+
+    Xmvs[X] = '\0';
+    Omvs[O] = '\0';
+
+    //Check winner
+    if(strncmp(Xmvs, "012", 3) == 0){
+        printf("X WINs, print some more stuff and start new game (%i)(%s)\n", strncmp(Xmvs, "012", 3), Xmvs);
+        sleep(10);
+        newGame(p);
+        return 0;
+    }
+
+    //Draw
+    if(X + O == 9){
+        printf("Draw..\n");
+        sleep(3);
+    }
+
+
+    //Possible winner at min 4 moves, start checking for winner
+    if(X + O >= 4){
+        printf("4 moves made..\n");
+        sleep(3);
+    }
 
     //if move is valid
     if(validMv){
@@ -148,4 +180,20 @@ void parseMove(gInt *p)
         //Illegal turn, do nothing, Signal cont
         p->sem = 1;
     }
+
+    return 0;
+}
+
+void newGame(gInt *p)
+{
+    //Init new gameState
+    memcpy(p->game, "*********\0", 10);
+    printf("p->game = %s\n", p->game);
+
+    //Initialise players to none
+    p->playerX = '*';
+    p->playerO = '*';
+    p->playerTurn = 'X';
+    memcpy(p->nextMove, "* \0", 3);
+    p->sem = 1;
 }
