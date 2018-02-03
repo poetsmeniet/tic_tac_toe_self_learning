@@ -22,6 +22,8 @@ typedef struct gameArrayInt{
 struct gameArrayInt *initGame(char *shmName);
 int parseMove(gInt *p);
 void newGame(gInt *p);
+int findWinner(char *gameState);
+int setMove(gInt *p, char col, int row);
 
 int main(void)
 {
@@ -91,17 +93,118 @@ int parseMove(gInt *p)
 {
     char col = p->nextMove[0];
     int row = p->nextMove[1] - '0';
-    printf(" -- parsing, new move is col %c, row %i\n", col, row);
 
-    //Default to yes
+    if(setMove(p, col, row) == 0){
+        p->sem = 1;
+        return 0;
+    }
+    
+    //Calculate draw
+    int i;
+    int e;
+
+    for(i = 0; i < 10; i++){
+        if(p->game[i] == '*')
+            e++;
+    }
+
+    if(e == 0){
+        printf("Draw..\n");
+        sleep(10);
+        newGame(p);
+        return 0;
+    }
+
+    //Find a winner
+    if(findWinner(p->game) == 1){
+        printf("X WINs, print some more stuff and start new game\n");
+        sleep(10);
+        newGame(p);
+        return 0;
+    }else if(findWinner(p->game) == 2){
+        printf("O WINs, print some more stuff and start new game\n");
+        sleep(10);
+        newGame(p);
+        return 0;
+    }
+    
+    //Switch turn
+    if(p->playerTurn == 'X')
+        p->playerTurn = 'O';
+    else
+        p->playerTurn = 'X';
+
+    p->sem = 1;
+
+    return 0;
+}
+
+void newGame(gInt *p)
+{
+    //Init new gameState
+    memcpy(p->game, "*********\0", 10);
+    printf("p->game = %s\n", p->game);
+
+    //Initialise players to none
+    p->playerX = '*';
+    p->playerO = '*';
+    p->playerTurn = 'X';
+    memcpy(p->nextMove, "* \0", 3);
+    p->sem = 1;
+}
+
+/*returns int:
+ * 0: no winner (yet)
+ * 1: X wins
+ * 2: O wins */
+int findWinner(char *gameState)
+{
+    if(gameState[0] == 'X' && gameState[1] == 'X' && gameState[2] == 'X')
+        return 1;
+    else if(gameState[0] == 'O' && gameState[1] == 'O' && gameState[2] == 'O')
+        return 2;
+    else if(gameState[3] == 'X' && gameState[4] == 'X' && gameState[5] == 'X')
+        return 1;
+    else if(gameState[3] == 'O' && gameState[4] == 'O' && gameState[5] == 'O')
+        return 2;
+    else if(gameState[6] == 'X' && gameState[7] == 'X' && gameState[8] == 'X')
+        return 1;
+    else if(gameState[6] == 'O' && gameState[7] == 'O' && gameState[8] == 'O')
+        return 2;
+    else if(gameState[0] == 'X' && gameState[3] == 'X' && gameState[6] == 'X')
+        return 1;
+    else if(gameState[0] == 'O' && gameState[3] == 'O' && gameState[6] == 'O')
+        return 2;
+    else if(gameState[1] == 'X' && gameState[4] == 'X' && gameState[7] == 'X')
+        return 1;
+    else if(gameState[1] == 'O' && gameState[4] == 'O' && gameState[7] == 'O')
+        return 2;
+    else if(gameState[2] == 'X' && gameState[5] == 'X' && gameState[8] == 'X')
+        return 1;
+    else if(gameState[2] == 'O' && gameState[5] == 'O' && gameState[8] == 'O')
+        return 2;
+    else if(gameState[0] == 'X' && gameState[4] == 'X' && gameState[8] == 'X')
+        return 1;
+    else if(gameState[0] == 'O' && gameState[4] == 'O' && gameState[8] == 'O')
+        return 2;
+    else if(gameState[2] == 'X' && gameState[4] == 'X' && gameState[6] == 'X')
+        return 1;
+    else if(gameState[2] == 'O' && gameState[4] == 'O' && gameState[6] == 'O')
+        return 2;
+    else
+        return 0;
+}
+
+int setMove(gInt *p, char col, int row)
+{
     int validMv = 1;
-
+    
     //Is move in range?
     if(col > 'c')
         validMv = 0;
     if(row > 3)
         validMv = 0;
-        
+
     //Is move available?
     if(col == 'a' && row == 1 && p->game[0] == '*')
         p->game[0] = p->playerTurn;
@@ -123,77 +226,6 @@ int parseMove(gInt *p)
         p->game[8] = p->playerTurn;
     else
         validMv = 0;
-        
-    //Does this make a winner?
-    int i;
-    int X = 0;
-    int O = 0;
-    char Xmvs[10];
-    char Omvs[10];
 
-    for(i = 0; i < 10; i++){
-        if(p->game[i] == 'X'){
-            Xmvs[X] = i + '0';
-            X++;
-        }else if(p->game[i] == 'O'){
-            Omvs[O] = i + '0';
-            O++;
-        }
-    }
-
-    Xmvs[X] = '\0';
-    Omvs[O] = '\0';
-
-    //Check winner
-    if(strncmp(Xmvs, "012", 3) == 0){
-        printf("X WINs, print some more stuff and start new game (%i)(%s)\n", strncmp(Xmvs, "012", 3), Xmvs);
-        sleep(10);
-        newGame(p);
-        return 0;
-    }
-
-    //Draw
-    if(X + O == 9){
-        printf("Draw..\n");
-        sleep(3);
-    }
-
-
-    //Possible winner at min 4 moves, start checking for winner
-    if(X + O >= 4){
-        printf("4 moves made..\n");
-        sleep(3);
-    }
-
-    //if move is valid
-    if(validMv){
-
-        //Switch turn
-        if(p->playerTurn == 'X')
-            p->playerTurn = 'O';
-        else
-            p->playerTurn = 'X';
-
-        //Signal cont
-        p->sem = 1;
-    }else{
-        //Illegal turn, do nothing, Signal cont
-        p->sem = 1;
-    }
-
-    return 0;
-}
-
-void newGame(gInt *p)
-{
-    //Init new gameState
-    memcpy(p->game, "*********\0", 10);
-    printf("p->game = %s\n", p->game);
-
-    //Initialise players to none
-    p->playerX = '*';
-    p->playerO = '*';
-    p->playerTurn = 'X';
-    memcpy(p->nextMove, "* \0", 3);
-    p->sem = 1;
+    return validMv;
 }
