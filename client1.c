@@ -4,6 +4,7 @@
 #include <fcntl.h> 
 #include <string.h> 
 #include <unistd.h>
+#define clear() printf("\033[H\033[J") //to clear the linux term
 
 typedef struct gameArrayInt{
     char game[10];
@@ -13,6 +14,25 @@ typedef struct gameArrayInt{
     char nextMove[3];
     int sem;
 }gInt;
+
+void displayGame(gInt *p, char player)
+{
+    clear();
+
+    if(player == 'X'){
+        
+        int i;
+        int j = 9;
+        
+        for(i = 3; i > 0; i--){
+            printf("%i    %c | %c | %c \n", i, p->game[j - 3], p->game[j - 2], p->game[j - 1]);
+            if(i > 1)
+                printf("    ---|---|---\n");
+            j -= 3;
+        }
+        printf("\n     a   b   c\n\n");
+    }
+}
 
 int main(void)
 {
@@ -53,15 +73,14 @@ int main(void)
         char nextMove[10];
         //Turn?
         if(p->playerTurn == player && p->sem){
-           // printf("is %c == %c?\n", p->playerTurn, player);
-            printf("gameState: %s\n", p->game);
+            displayGame(p, player);
             printf("Please make a move:\n?>");
             fgets(nextMove, 10, stdin);
             p->sem = 0;
             memcpy(p->nextMove, nextMove, 3);
             p->nextMove[2] = '\0';
         }else{
-            printf("gameState: %s\n", p->game);
+            displayGame(p, player);
         }
         //sleep(1);
         usleep(50000);
