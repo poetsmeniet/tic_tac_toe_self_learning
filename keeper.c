@@ -16,7 +16,7 @@ typedef struct gameArrayInt{
     char playerO;
     char playerTurn;
     char nextMove[3];
-    int sem;
+    int lck;
 }gInt;
 
 struct gameArrayInt *initGame(char *shmName);
@@ -42,7 +42,7 @@ int main(void)
 
         if(p->nextMove[0] != '*'){
             //Signal stop to clients
-            p->sem = 0; //Spurious
+            p->lck = 0; //Spurious
 
             printf("-parse move-\n");
             parseMove(p);
@@ -97,7 +97,7 @@ int parseMove(gInt *p)
     if(setMove(p, col, row) == 0){
         printf("setmove returns 0\n");
         sleep(5);
-        p->sem = 1;
+        p->lck = 1;
         return 0;
     }
     
@@ -112,7 +112,7 @@ int parseMove(gInt *p)
 
     if(e == 0){
         printf("Draw..\n");
-        sleep(10);
+        sleep(5);
         newGame(p);
         return 0;
     }
@@ -136,7 +136,7 @@ int parseMove(gInt *p)
     else
         p->playerTurn = 'X';
 
-    p->sem = 1;
+    p->lck = 1;
 
     return 0;
 }
@@ -152,7 +152,7 @@ void newGame(gInt *p)
     p->playerO = '*';
     p->playerTurn = 'X';
     memcpy(p->nextMove, "* \0", 3);
-    p->sem = 1;
+    p->lck = 1;
 }
 
 /*returns int:

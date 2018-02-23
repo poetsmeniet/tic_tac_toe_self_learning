@@ -12,7 +12,7 @@ typedef struct gameArrayInt{
     char playerO;
     char playerTurn;
     char nextMove[3];
-    int sem;
+    int lck;
 }gInt;
 
 void displayGame(gInt *p, char player)
@@ -69,11 +69,11 @@ int main(void)
     while(1){
         char nextMove[10];
         //Turn?
-        if(p->playerTurn == player && p->sem){
+        if(p->playerTurn == player && p->lck){
             displayGame(p, player);
             printf("Please make a move:\n?>");
             fgets(nextMove, 10, stdin);
-            p->sem = 0;
+            p->lck = 0;
             memcpy(p->nextMove, nextMove, 3);
             p->nextMove[2] = '\0';
         }else{
