@@ -4,21 +4,12 @@
 #include <fcntl.h> 
 #include <string.h> 
 #include <unistd.h>
-#define clear() printf("\033[H\033[J") //to clear the linux term
-
-typedef struct gameArrayInt{
-    char game[10];
-    char playerX;
-    char playerO;
-    char playerTurn;
-    char nextMove[3];
-    int lck;
-    char bcastMsg[200];
-}gInt;
+#include "tictactoe.h"
+#define CLEAR() printf("\033[H\033[J") //to clear the linux term
 
 void displayGame(gInt *p, char player)
 {
-    clear();
+    CLEAR();
     printf("Player: %c\n\n", player);
 
     int i;
