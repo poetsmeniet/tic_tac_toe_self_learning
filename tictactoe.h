@@ -14,6 +14,7 @@ typedef struct gameArrayInt{
     char nextMove[3];
     int lck;
     char bcastMsg[200];
+    char winner;
 }gInt;
 
 #endif
