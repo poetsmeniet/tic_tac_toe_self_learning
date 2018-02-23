@@ -95,6 +95,8 @@ int parseMove(gInt *p)
     int row = p->nextMove[1] - '0';
 
     if(setMove(p, col, row) == 0){
+        printf("setmove returns 0\n");
+        sleep(5);
         p->sem = 1;
         return 0;
     }
@@ -118,12 +120,12 @@ int parseMove(gInt *p)
     //Find a winner
     if(findWinner(p->game) == 1){
         printf("X WINs, print some more stuff and start new game\n");
-        sleep(10);
+        sleep(5);
         newGame(p);
         return 0;
     }else if(findWinner(p->game) == 2){
         printf("O WINs, print some more stuff and start new game\n");
-        sleep(10);
+        sleep(5);
         newGame(p);
         return 0;
     }
@@ -205,23 +207,23 @@ int setMove(gInt *p, char col, int row)
     if(row > 3)
         validMv = 0;
 
-    //Is move available?
+    //If possible, set the move
     if(col == 'a' && row == 1 && p->game[0] == '*')
         p->game[0] = p->playerTurn;
-    else if(col == 'a' && row == 2 && p->game[1] == '*')
-        p->game[1] = p->playerTurn;
-    else if(col == 'a' && row == 3 && p->game[2] == '*')
-        p->game[2] = p->playerTurn;
-    else if(col == 'b' && row == 1 && p->game[3] == '*')
+    else if(col == 'a' && row == 2 && p->game[3] == '*')
         p->game[3] = p->playerTurn;
+    else if(col == 'a' && row == 3 && p->game[6] == '*')
+        p->game[6] = p->playerTurn;
+    else if(col == 'b' && row == 1 && p->game[1] == '*')
+        p->game[1] = p->playerTurn;
     else if(col == 'b' && row == 2 && p->game[4] == '*')
         p->game[4] = p->playerTurn;
-    else if(col == 'b' && row == 3 && p->game[5] == '*')
-        p->game[5] = p->playerTurn;
-    else if(col == 'c' && row == 1 && p->game[6] == '*')
-        p->game[6] = p->playerTurn;
-    else if(col == 'c' && row == 2 && p->game[7] == '*')
+    else if(col == 'b' && row == 3 && p->game[7] == '*')
         p->game[7] = p->playerTurn;
+    else if(col == 'c' && row == 1 && p->game[2] == '*')
+        p->game[2] = p->playerTurn;
+    else if(col == 'c' && row == 2 && p->game[5] == '*')
+        p->game[5] = p->playerTurn;
     else if(col == 'c' && row == 3 && p->game[8] == '*')
         p->game[8] = p->playerTurn;
     else
