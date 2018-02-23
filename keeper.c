@@ -17,6 +17,7 @@ typedef struct gameArrayInt{
     char playerTurn;
     char nextMove[3];
     int lck;
+    char bcastMsg[200];
 }gInt;
 
 struct gameArrayInt *initGame(char *shmName);
@@ -120,11 +121,13 @@ int parseMove(gInt *p)
     //Find a winner
     if(findWinner(p->game) == 1){
         printf("X WINs, print some more stuff and start new game\n");
+        memcpy(p->bcastMsg, "X wins this game! Starting new game..\0", 38);
         sleep(5);
         newGame(p);
         return 0;
     }else if(findWinner(p->game) == 2){
         printf("O WINs, print some more stuff and start new game\n");
+        memcpy(p->bcastMsg, "O wins this game! Starting new game..\0", 38);
         sleep(5);
         newGame(p);
         return 0;
@@ -152,6 +155,7 @@ void newGame(gInt *p)
     p->playerO = '*';
     p->playerTurn = 'X';
     memcpy(p->nextMove, "* \0", 3);
+    memcpy(p->bcastMsg, "Welcome to a new game\0", 22);
     p->lck = 1;
 }
 
@@ -200,6 +204,8 @@ int findWinner(char *gameState)
 int setMove(gInt *p, char col, int row)
 {
     int validMv = 1;
+
+    memcpy(p->bcastMsg, "The game is afoot..\0", 21);
     
     //Is move in range?
     if(col > 'c')

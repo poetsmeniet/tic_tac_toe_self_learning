@@ -13,11 +13,13 @@ typedef struct gameArrayInt{
     char playerTurn;
     char nextMove[3];
     int lck;
+    char bcastMsg[200];
 }gInt;
 
 void displayGame(gInt *p, char player)
 {
     clear();
+    printf("Player: %c\n\n", player);
 
     int i;
     int j = 9;
@@ -29,6 +31,7 @@ void displayGame(gInt *p, char player)
         j -= 3;
     }
     printf("\n     a   b   c\n\n");
+    printf("%s\n", p->bcastMsg);
 }
 
 int main(void)
