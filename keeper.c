@@ -97,14 +97,6 @@ int parseMove(gData *p)
             e++;
     }
 
-    if(e == 0){
-        printf("Draw..\n");
-        memcpy(p->bcastMsg, "Draw! Tie! A new game begins soon..\0", 36);
-        sleep(5);
-        newGame(p);
-        return 0;
-    }
-
     //Find a winner
     if(findWinner(p->game) == 1){
         printf("X WINs, print some more stuff and start new game\n");
@@ -121,6 +113,16 @@ int parseMove(gData *p)
         newGame(p);
         return 0;
     }
+    
+    //Find tie
+    if(e == 0){
+        printf("Draw..\n");
+        memcpy(p->bcastMsg, "Draw! Tie! A new game begins soon..\0", 36);
+        sleep(5);
+        newGame(p);
+        return 0;
+    }
+
     
     //Switch turn
     if(p->playerTurn == 'X')
