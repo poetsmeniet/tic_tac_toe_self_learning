@@ -7,23 +7,7 @@
 #include "tictactoe.h"
 #define CLEAR() printf("\033[H\033[J") //to clear the linux term
 
-void displayGame(gData *p, char player)
-{
-    CLEAR();
-    printf("Player: %c\n\n", player);
-
-    int i;
-    int j = 9;
-    
-    for(i = 3; i > 0; i--){
-        printf("%i    %c | %c | %c \n", i, p->game[j - 3], p->game[j - 2], p->game[j - 1]);
-        if(i > 1)
-            printf("    ---|---|---\n");
-        j -= 3;
-    }
-    printf("\n     a   b   c\n\n");
-    printf("%s\n", p->bcastMsg);
-}
+void displayGame(gData *p, char player);
 
 int main(void)
 {
@@ -67,16 +51,33 @@ int main(void)
             displayGame(p, player);
             printf("Please make a move:\n?>");
             fgets(nextMove, 10, stdin);
-            p->lck = 0;
+            p->lck = 0; //lock mem
             memcpy(p->nextMove, nextMove, 3);
             p->nextMove[2] = '\0';
         }else{
             displayGame(p, player);
         }
-        //sleep(1);
         usleep(50000);
     }
 
     munmap(&p, sizeof(gData));
     return 0;
+}
+
+void displayGame(gData *p, char player)
+{
+    CLEAR();
+    printf("Player: %c\n\n", player);
+
+    int i;
+    int j = 9;
+    
+    for(i = 3; i > 0; i--){
+        printf("%i    %c | %c | %c \n", i, p->game[j - 3], p->game[j - 2], p->game[j - 1]);
+        if(i > 1)
+            printf("    ---|---|---\n");
+        j -= 3;
+    }
+    printf("\n     a   b   c\n\n");
+    printf("%s\n", p->bcastMsg);
 }
