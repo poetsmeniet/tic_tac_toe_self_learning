@@ -12,7 +12,7 @@ typedef struct gameData{
     char playerO;
     char playerTurn;
     char nextMove[3];
-    int lck;
+    int lck; //lck == 1: continue, else locked
     char bcastMsg[200];
     char winner;
 }gData;
