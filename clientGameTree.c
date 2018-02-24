@@ -75,6 +75,9 @@ int main(void)
 void selectRandomMove(char *game, char *nextMove)
 {
     int rnd = rand() % 9;
+    while(game[rnd] != '*')
+        rnd = rand() % 9;
+
     char rndMv[3];
 
     if(rnd == 0)
@@ -97,7 +100,6 @@ void selectRandomMove(char *game, char *nextMove)
         memcpy(rndMv, "c3\0", 3);
 
     printf("random nr slected: %i\n", rnd);
-    sleep(1);
     strncpy(nextMove, rndMv, 3);
 }
 
