@@ -6,7 +6,7 @@
  * O = Player O position
  * X = Player X position
  */
-typedef struct gameArrayInt{
+typedef struct gameData{
     char game[10];
     char playerX;
     char playerO;
@@ -15,6 +15,6 @@ typedef struct gameArrayInt{
     int lck;
     char bcastMsg[200];
     char winner;
-}gInt;
+}gData;
 
 #endif

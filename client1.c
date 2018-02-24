@@ -7,7 +7,7 @@
 #include "tictactoe.h"
 #define CLEAR() printf("\033[H\033[J") //to clear the linux term
 
-void displayGame(gInt *p, char player)
+void displayGame(gData *p, char player)
 {
     CLEAR();
     printf("Player: %c\n\n", player);
@@ -35,8 +35,8 @@ int main(void)
         return 1;
     }
 
-    struct gameArrayInt *p;
-    p = mmap(NULL, sizeof(struct gameArrayInt), PROT_WRITE, MAP_SHARED, smfd, 0);
+    gData *p;
+    p = mmap(NULL, sizeof(gData), PROT_WRITE, MAP_SHARED, smfd, 0);
 
     if(p < 0){
         perror("mmap failed.\n");
@@ -77,6 +77,6 @@ int main(void)
         usleep(50000);
     }
 
-    munmap(&p, sizeof(struct gameArrayInt));
+    munmap(&p, sizeof(gData));
     return 0;
 }

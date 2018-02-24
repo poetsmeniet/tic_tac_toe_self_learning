@@ -6,17 +6,18 @@
 #include <unistd.h>
 #include "tictactoe.h"
 
-struct gameArrayInt *initGame(char *shmName);
-int parseMove(gInt *p);
-void newGame(gInt *p);
+//gData *initGame(char *shmName);
+gData *initGame(char *shmName);
+int parseMove(gData *p);
+void newGame(gData *p);
 int findWinner(char *gameState);
-int setMove(gInt *p, char col, int row);
+int setMove(gData *p, char col, int row);
 
 int main(void)
 {
     char shmName[] = "/gameState";
 
-    struct gameArrayInt *p = initGame(shmName);
+    gData *p = initGame(shmName);
 
     //parse moves
     while(1){
@@ -40,7 +41,7 @@ int main(void)
         usleep(50000);
     }
 
-    munmap(&p, sizeof(struct gameArrayInt));
+    munmap(&p, sizeof(gData));
 
     shm_unlink(shmName);
 
@@ -48,7 +49,7 @@ int main(void)
 }
 
 /* Returns pointer to shared memory game state array */
-struct gameArrayInt *initGame(char *shmName)
+gData *initGame(char *shmName)
 {
     int smfd = shm_open (shmName, O_RDWR | O_CREAT, 0660); 
 
@@ -58,15 +59,15 @@ struct gameArrayInt *initGame(char *shmName)
         return NULL;
     }
 
-    struct gameArrayInt *p;
-    p = mmap(NULL, sizeof(struct gameArrayInt), PROT_WRITE, MAP_SHARED, smfd, 0);
+    gData *p;
+    p = mmap(NULL, sizeof(gData), PROT_WRITE, MAP_SHARED, smfd, 0);
 
-    if (ftruncate (smfd, sizeof (struct gameArrayInt)) == -1) 
+    if (ftruncate (smfd, sizeof (gData)) == -1) 
         perror ("ftruncate");
 
     if(p < 0){
         perror("mmap failed.\n");
-        munmap(&p, sizeof(struct gameArrayInt));
+        munmap(&p, sizeof(gData));
         return NULL;
     }
 
@@ -76,21 +77,20 @@ struct gameArrayInt *initGame(char *shmName)
     return p;
 }
 
-int parseMove(gInt *p)
+int parseMove(gData *p)
 {
     char col = p->nextMove[0];
     int row = p->nextMove[1] - '0';
 
     if(setMove(p, col, row) == 0){
         printf("setmove returns 0\n");
-        sleep(5);
         p->lck = 1;
         return 0;
     }
     
     //Calculate draw
     int i;
-    int e;
+    int e = 0;
 
     for(i = 0; i < 10; i++){
         if(p->game[i] == '*')
@@ -99,6 +99,7 @@ int parseMove(gInt *p)
 
     if(e == 0){
         printf("Draw..\n");
+        memcpy(p->bcastMsg, "Draw! Tie! A new game begins soon..\0", 36);
         sleep(5);
         newGame(p);
         return 0;
@@ -132,7 +133,7 @@ int parseMove(gInt *p)
     return 0;
 }
 
-void newGame(gInt *p)
+void newGame(gData *p)
 {
     //Init new gameState
     memcpy(p->game, "*********\0", 10);
@@ -190,7 +191,7 @@ int findWinner(char *gameState)
         return 0;
 }
 
-int setMove(gInt *p, char col, int row)
+int setMove(gData *p, char col, int row)
 {
     int validMv = 1;
 
