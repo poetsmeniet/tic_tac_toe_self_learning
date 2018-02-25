@@ -5,7 +5,6 @@
 #include <string.h> 
 #include <unistd.h>
 #include "tictactoe.h"
-#define UDELAY 1000
 
 //gData *initGame(char *shmName);
 gData *initGame(char *shmName);
@@ -69,6 +68,10 @@ gData *initGame(char *shmName)
         munmap(&p, sizeof(gData));
         return NULL;
     }
+
+    //Initialise players to none
+    p->playerX = '*';
+    p->playerO = '*';
 
     p->scoreX = 0;
     p->scoreO = 0;
@@ -146,10 +149,14 @@ void newGame(gData *p)
     memcpy(p->game, "*********\0", 10);
     //printf("p->game = %s\n", p->game);
 
-    //Initialise players to none
-    p->playerX = '*';
-    p->playerO = '*';
-    p->playerTurn = 'X';
+    //Alternate who may make the first move
+    if(p->playerTurn == 'O')
+        p->playerTurn = 'X';
+    else if(p->playerTurn == 'X')
+        p->playerTurn = 'O';
+    else
+        p->playerTurn = 'X';
+
     memcpy(p->nextMove, "* \0", 3);
     memcpy(p->bcastMsg, "Welcome to a new game\0", 22);
     p->winner = '*';
