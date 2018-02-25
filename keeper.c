@@ -5,6 +5,7 @@
 #include <string.h> 
 #include <unistd.h>
 #include "tictactoe.h"
+#define UDELAY 1000
 
 //gData *initGame(char *shmName);
 gData *initGame(char *shmName);
@@ -38,7 +39,7 @@ int main(void)
         }
 
         //usleep(500000);
-        usleep(50000);
+        usleep(UDELAY);
     }
 
     munmap(&p, sizeof(gData));
@@ -71,6 +72,10 @@ gData *initGame(char *shmName)
         return NULL;
     }
 
+    p->scoreX = 0;
+    p->scoreO = 0;
+    p->ties = 0;
+
     //Init new gameState
     newGame(p);
 
@@ -102,14 +107,16 @@ int parseMove(gData *p)
         printf("X WINs, print some more stuff and start new game\n");
         memcpy(p->bcastMsg, "X wins this game! Starting new game..\0", 38);
         p->winner = 'X';
-        sleep(5);
+        p->scoreX++;
+        usleep(UDELAY);
         newGame(p);
         return 0;
     }else if(findWinner(p->game) == 2){
         printf("O WINs, print some more stuff and start new game\n");
         memcpy(p->bcastMsg, "O wins this game! Starting new game..\0", 38);
         p->winner = 'O';
-        sleep(5);
+        p->scoreO++;
+        usleep(UDELAY);
         newGame(p);
         return 0;
     }
@@ -118,12 +125,12 @@ int parseMove(gData *p)
     if(e == 0){
         printf("Draw..\n");
         memcpy(p->bcastMsg, "Draw! Tie! A new game begins soon..\0", 36);
-        sleep(5);
+        p->ties++;
+        usleep(UDELAY);
         newGame(p);
         return 0;
     }
 
-    
     //Switch turn
     if(p->playerTurn == 'X')
         p->playerTurn = 'O';

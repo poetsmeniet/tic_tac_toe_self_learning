@@ -53,7 +53,6 @@ int main(void)
         //Turn?
         if(p->playerTurn == player && p->lck){
             displayGame(p, player);
-            printf("Selecting next best move...\n");
             
             srand(time(NULL));
             selectRandomMove(p->game, nextMove);
@@ -70,6 +69,25 @@ int main(void)
 
     munmap(&p, sizeof(gData));
     return 0;
+}
+
+void displayGame(gData *p, char player)
+{
+    CLEAR();
+    printf("Player: %c. Scores; X: %d, O: %d, ties: %d\n\n", \
+            player, p->scoreX, p->scoreO, p->ties);
+
+    int i;
+    int j = 9;
+    
+    for(i = 3; i > 0; i--){
+        printf("%i    %c | %c | %c \n", i, p->game[j - 3], p->game[j - 2], p->game[j - 1]);
+        if(i > 1)
+            printf("    ---|---|---\n");
+        j -= 3;
+    }
+    printf("\n     a   b   c\n\n");
+    printf("%s\n", p->bcastMsg);
 }
 
 void selectRandomMove(char *game, char *nextMove)
@@ -99,24 +117,24 @@ void selectRandomMove(char *game, char *nextMove)
     else if(rnd == 8)
         memcpy(rndMv, "c3\0", 3);
 
-    printf("random nr slected: %i\n", rnd);
     strncpy(nextMove, rndMv, 3);
 }
 
-void displayGame(gData *p, char player)
+void selectBestMove(char *game)
 {
-    CLEAR();
-    printf("Player: %c\n\n", player);
-
-    int i;
-    int j = 9;
-    
-    for(i = 3; i > 0; i--){
-        printf("%i    %c | %c | %c \n", i, p->game[j - 3], p->game[j - 2], p->game[j - 1]);
-        if(i > 1)
-            printf("    ---|---|---\n");
-        j -= 3;
-    }
-    printf("\n     a   b   c\n\n");
-    printf("%s\n", p->bcastMsg);
+    //Possible moves.. are *
+        
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

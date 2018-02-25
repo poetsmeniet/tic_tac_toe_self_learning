@@ -15,6 +15,9 @@ typedef struct gameData{
     int lck; //lck == 1: continue, else locked
     char bcastMsg[200];
     char winner;
+    int scoreX;
+    int scoreO;
+    int ties;
 }gData;
 
 #endif
