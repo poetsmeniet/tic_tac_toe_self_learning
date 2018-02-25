@@ -15,6 +15,7 @@ void displayGame(gData *p, char player);
 
 int main(void)
 {
+    srand(time(NULL));
     char name[] = "/gameState";
     int smfd = shm_open (name, O_RDWR, 0660); 
 
@@ -54,7 +55,6 @@ int main(void)
         if(p->playerTurn == player && p->lck){
             displayGame(p, player);
             
-            srand(time(NULL));
             selectRandomMove(p->game, nextMove);
 
             p->lck = 0; //lock mem
@@ -63,8 +63,8 @@ int main(void)
         }else{
             displayGame(p, player);
         }
-        //sleep(1);
-        usleep(50000);
+
+        usleep(UDELAY);
     }
 
     munmap(&p, sizeof(gData));
