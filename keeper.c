@@ -23,22 +23,20 @@ int main(void)
     //parse moves
     while(1){
         //temporarily use usleep in loop
-        printf("gameState: %s\n", p->game);
-        printf("PlayerX: %c\n", p->playerX);
-        printf("PlayerO: %c\n", p->playerO);
-        printf("it is Player %c's turn\n", p->playerTurn);
-        printf("nextMove: %s\n\n", p->nextMove);
+        //printf("gameState: %s\n", p->game);
+        //printf("PlayerX: %c\n", p->playerX);
+        //printf("PlayerO: %c\n", p->playerO);
+        //printf("it is Player %c's turn\n", p->playerTurn);
+        //printf("nextMove: %s\n\n", p->nextMove);
 
         if(p->nextMove[0] != '*'){
             //Signal stop to clients
             p->lck = 0; //Spurious
 
-            printf("-parse move-\n");
             parseMove(p);
             memcpy(p->nextMove, "* \0", 3);
         }
 
-        //usleep(500000);
         usleep(UDELAY);
     }
 
@@ -104,7 +102,7 @@ int parseMove(gData *p)
 
     //Find a winner
     if(findWinner(p->game) == 1){
-        printf("X WINs, print some more stuff and start new game\n");
+        printf("X Wins\n");
         memcpy(p->bcastMsg, "X wins this game! Starting new game..\0", 38);
         p->winner = 'X';
         p->scoreX++;
@@ -112,7 +110,7 @@ int parseMove(gData *p)
         newGame(p);
         return 0;
     }else if(findWinner(p->game) == 2){
-        printf("O WINs, print some more stuff and start new game\n");
+        printf("O WINs\n");
         memcpy(p->bcastMsg, "O wins this game! Starting new game..\0", 38);
         p->winner = 'O';
         p->scoreO++;
@@ -146,7 +144,7 @@ void newGame(gData *p)
 {
     //Init new gameState
     memcpy(p->game, "*********\0", 10);
-    printf("p->game = %s\n", p->game);
+    //printf("p->game = %s\n", p->game);
 
     //Initialise players to none
     p->playerX = '*';
