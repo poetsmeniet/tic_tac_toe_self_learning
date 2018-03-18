@@ -1,8 +1,8 @@
 #ifndef tictactoe_H_
 #define tictactoe_H_
 
-//#define UDELAY 1000
-#define UDELAY 10000
+#define UDELAY 100
+//#define UDELAY 10000
 
 /* The game state:
  * * = empty 
