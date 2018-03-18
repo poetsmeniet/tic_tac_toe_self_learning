@@ -6,6 +6,7 @@
 
 typedef struct tree{
     int nr;
+    int points;
     struct tree *branche[MAXBRANCHES];
 }tree;
 
@@ -31,14 +32,25 @@ int main(void)
     /* Define binary tree */
     tree tree;
     tree.nr = 0;
+    tree.points = 0;
     tree.branche[0]= NULL;
 
     populateTree(&tree, depth, brCnt);
 
     printf("Root: %i\n", tree.nr);
-    traverseTree(&tree, 0);
-    printf("Branche count: %i\n", brancheCnt);
+
+    int i;
+
+    int pathScores[depth];
+    for(i = 1; i <= depth; i++)
+        pathScores[i] = 0;
+    traverseTree(&tree, 0, 0, &pathScores);
     
+    printf("checking pathScores:\n");
+    for(i = 1; i <= depth; i++){
+        printf("path %i has total score of %i\n", i, pathScores[i]);
+    }
+
     return 0;
 }
 
@@ -46,17 +58,30 @@ int main(void)
 int populateTree(tree *branch, int depth, int brCnt)
 {
     /* Base case */
-    if(depth == 0)
+    if(depth == 0){
+        printf("WE HAVE REACHED THE END: %i, points: %i\n", branch->nr, branch->points);
         return 0;
+    }
 
     /* Supplied arbitrary value for tree branche */
     static int cnt = 1;
 
     int j;
+    int points = 3;
+
+    //example points assignment
+        if(cnt == 6\
+                || cnt == 11)
+            points = 1;
+        else if(cnt == 15 || cnt == 10)
+            points = -1;
+        else
+            points = 0;
 
     for(j = 0; j < brCnt; j++){
         branch->branche[j] = malloc(sizeof(tree));
         branch->branche[j]->nr = cnt;
+        branch->branche[j]->points = points;
         branch->branche[j]->branche[0]= NULL;
         
         brancheCnt++;
@@ -76,25 +101,36 @@ int populateTree(tree *branch, int depth, int brCnt)
 }
 
 /* Traverse the tree recursively */
-int traverseTree(tree *tree, int parent)
+int traverseTree(tree *tree, int parent, int points, int *pathScores)
 {
     int j;
 
-    //Get the number of branches
-    int i = 0;
+    int totPoints;
+    static int endstateCnt = 0;
+
+    /* Get the number of branches */
+    int i = 1;
     while(tree->branche[i] != NULL)
         i++;
 
+    totPoints = points + tree->points;
     /* Go through this branch */
-    for(j = 0; j <= i; j++){
-        /* Base case, exit on NULL pointer */
-        if(tree->branche[j] == NULL)
-            return 0;
+    for(j = 0; j < i; j++){
+        /* End case */
+        if(tree->branche[j] == NULL){
+            printf("\tendstate cnt: %i, totPoints: %i\n", endstateCnt, totPoints);
+            /* Add score of this path to array */
+            pathScores[endstateCnt] += totPoints;
+            return totPoints;
+        }
 
-        printf("nodenr: %i (parent: %i)\n", tree->branche[j]->nr, parent);
+        /* Increment path index */
+        if(parent == 0)
+            endstateCnt++;
+
+        printf("nodenr: %i (parent: %i), points: %i totPoints: %i\n", tree->branche[j]->nr, parent, tree->branche[j]->points, totPoints);
         
-        traverseTree(tree->branche[j], tree->branche[j]->nr);
-        
+        traverseTree(tree->branche[j], tree->branche[j]->nr, totPoints, pathScores);
     }
 
     return 0;
