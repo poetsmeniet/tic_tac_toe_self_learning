@@ -6,7 +6,6 @@ struct movesInfo{
     int score;
 };
 
-
 /* Set whom is whom */
 char aiPlayer = 'X';
 char bioPlayer = 'O';
@@ -16,22 +15,22 @@ int isWinning(char *gameState, char currPlayer);
 int returnAvailableMoves();
 
 int miniMax(char *gameState, char player, struct movesInfo *moves);
+
+int selectBestMove(struct movesInfo *moves);
     
 int main(void)
 {
     /* Define some test variables */
-    char gameState[] = "X*X**O**X";
+    char gameState[] = "XOX**O**X";
     struct movesInfo moves[1000000];
     
     /* Run minimax */
     miniMax(gameState, aiPlayer, moves);
     
     /* Select best move */
-
-    printf("tt: 3 -- score: %d\n", moves[3].score);
-    printf("tt: 4 -- score: %d\n", moves[4].score);
-    printf("tt: 6 -- score: %d\n", moves[6].score);
-    printf("tt: 7 -- score: %d\n", moves[7].score);
+    int bestMove = selectBestMove(moves);
+    printf("Index chosen for best move: %d\n", bestMove);
+    
     return 0;
 }
 
@@ -78,8 +77,6 @@ int miniMax(char *gameState, char player, struct movesInfo *moves)
     int i = 0;
     int avMvCnt = returnAvailableMoves(gameState, avMoves);
     
-    printf("minimax has %d av moves..\n", avMvCnt);
-    
     /* Base case: return terminal gameState; win, lose, tie */
     if(isWinning(gameState, aiPlayer))
         return 1;
@@ -94,7 +91,7 @@ int miniMax(char *gameState, char player, struct movesInfo *moves)
         //printf("avMove: %d\n", avMoves[i]); 
         
         /* Store the index in movesInfo struct array */
-        moves[avMoves[i]].index = i;
+        moves[avMoves[i]].index = avMoves[i];
 
         /* Make a move on gameState for curr player */
         gameState[avMoves[i]] = player;
@@ -109,7 +106,6 @@ int miniMax(char *gameState, char player, struct movesInfo *moves)
 
         /* Save score to struct */
         moves[avMoves[i]].score += result;
-        printf("Sroting score %d in index %d\n", result, avMoves[i]);
 
         /* Reset the move */
         gameState[avMoves[i]] = '*';
@@ -118,4 +114,21 @@ int miniMax(char *gameState, char player, struct movesInfo *moves)
     }
     
     return 0;
+}
+
+/* Returns the best move gamestate index */
+int selectBestMove(struct movesInfo *moves)
+{
+    int i;
+    int currBest = 0;
+    int bestIndex;
+    for(i = 0; i < 9; i++){
+        //printf("\tA score of %d is found, with index: %d\n", moves[i].score, moves[i].index);
+        if(moves[i].score > currBest){
+            //printf("\t\tSetting highest score of %d is found, with index: %d\n", moves[i].score, moves[i].index);
+            bestIndex = moves[i].index;
+            currBest = moves[i].score;
+        }
+    }
+    return bestIndex;
 }
