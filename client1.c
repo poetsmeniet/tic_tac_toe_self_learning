@@ -67,7 +67,7 @@ int main(void)
 void displayGame(gData *p, char player)
 {
     CLEAR();
-    printf("Player: %c\n\n", player);
+    printf("Player: %c, lck: %d, playerturn: '%c'\n\n", player, p->lck, p->playerTurn);
 
     int i;
     int j = 9;

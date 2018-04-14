@@ -150,11 +150,11 @@ void newGame(gData *p)
     //printf("p->game = %s\n", p->game);
 
     //Alternate who may make the first move
-    if(p->playerTurn == 'O')
-        p->playerTurn = 'X';
-    else if(p->playerTurn == 'X')
-        p->playerTurn = 'O';
-    else
+    //if(p->playerTurn == 'O')
+    //    p->playerTurn = 'X';
+    //else if(p->playerTurn == 'X')
+    //    p->playerTurn = 'O';
+    //else
         p->playerTurn = 'X';
 
     memcpy(p->nextMove, "* \0", 3);
