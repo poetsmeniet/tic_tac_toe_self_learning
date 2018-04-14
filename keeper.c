@@ -109,7 +109,7 @@ int parseMove(gData *p)
         memcpy(p->bcastMsg, "X wins this game! Starting new game..\0", 38);
         p->winner = 'X';
         p->scoreX++;
-        usleep(UDELAY);
+        usleep(UDELAY2);
         newGame(p);
         return 0;
     }else if(findWinner(p->game) == 2){
@@ -117,7 +117,7 @@ int parseMove(gData *p)
         memcpy(p->bcastMsg, "O wins this game! Starting new game..\0", 38);
         p->winner = 'O';
         p->scoreO++;
-        usleep(UDELAY);
+        usleep(UDELAY2);
         newGame(p);
         return 0;
     }
@@ -127,7 +127,7 @@ int parseMove(gData *p)
         printf("Draw..\n");
         memcpy(p->bcastMsg, "Draw! Tie! A new game begins soon..\0", 36);
         p->ties++;
-        usleep(UDELAY);
+        usleep(UDELAY2);
         newGame(p);
         return 0;
     }

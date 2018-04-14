@@ -2,6 +2,7 @@
 #define tictactoe_H_
 
 #define UDELAY 100
+#define UDELAY2 2000000
 //#define UDELAY 10000
 
 /* The game state:

@@ -116,7 +116,7 @@ int main(void)
             }
 
         }else{
-            displayGame(p, player);
+            //displayGame(p, player);
         }
         usleep(50000);
     }
@@ -213,18 +213,22 @@ int selectBestMove(struct movesInfo *moves)
     int currBest = 0;
     int bestIndex;
     for(i = 0; i < 9; i++){
-        if(moves[i].score >= currBest){
+        printf("move found: %d, index %d\n", moves[i].score, moves[i].index);
+        if(moves[i].score > currBest){
             bestIndex = moves[i].index;
             currBest = moves[i].score;
+            printf("\tBest move found: %d, index %d\n", currBest, bestIndex);
         }
     }
 
     /* If no best move, select first available move */
-    if(currBest == 0)
-    for(i = 0; i < 9; i++)
-        if(moves[i].index > 0)
-            bestIndex = moves[i].index;
-
+    if(currBest == 0){
+        printf("Selecting next av move!!!!\n");
+        sleep(1);
+        for(i = 0; i < 9; i++)
+            if(moves[i].index > 0)
+                bestIndex = moves[i].index;
+    }
     return bestIndex;
 }
 
