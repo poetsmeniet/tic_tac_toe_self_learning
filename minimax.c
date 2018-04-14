@@ -3,26 +3,21 @@
 
 int isWinning(char *gameState, char currPlayer);
 
-void returnAvailableMoves();
+int returnAvailableMoves();
+
+int miniMax(char *gameState, char aiPlayer, char bioPlayer);
     
 int main(void)
 {
     /* Define some test variables */
     char gameState[] = "OOO**O**X";
-    char currPlayer = 'X';
-    printf("gamestate '%s', does player '%c' win: %d\n", gameState, currPlayer, isWinning(gameState, currPlayer));
-
-    /* Return and loop available moves
-     * - Run minimal for every avMove */
-    int avMoves[8];
-    int i = 0;
-    returnAvailableMoves(gameState, avMoves);
-    while(avMoves[i] != -1)
-    {
-        printf("avMove: %d\n", avMoves[i]); 
-        i++;
-    }
-
+    
+    /* Set whom is whom */
+    char aiPlayer = 'X';
+    char bioPlayer = 'O';
+    
+    int test[8];
+    printf("test: %d\n", returnAvailableMoves(gameState, test));
     return 0;
 }
 
@@ -45,7 +40,7 @@ int isWinning(char *gameState, char currPlayer)
 }
 
 /* Fills array of ints with indices of available moves */
-void returnAvailableMoves(char *gameState, int *avMoves)
+int returnAvailableMoves(char *gameState, int *avMoves)
 {
     int i;
     int j = 0;
@@ -57,4 +52,31 @@ void returnAvailableMoves(char *gameState, int *avMoves)
     }
 
     avMoves[j] = -1;
+
+    return j;
+}
+
+int miniMax(char *gameState, char aiPlayer, char bioPlayer)
+{
+
+    /* Return available moves */
+    int avMoves[8];
+    int i = 0;
+    int avMvCnt = returnAvailableMoves(gameState, avMoves);
+    
+    /* Base case: return terminal gameState; win, lose, tie */
+    if(isWinning(gameState, aiPlayer))
+        return 1;
+    else if(isWinning(gameState, bioPlayer))
+        return -1;
+    else if(avMvCnt == 0)
+        return 0;
+    
+    /* Loop over all available moves */
+    while(avMoves[i] != -1)
+    {
+        printf("avMove: %d\n", avMoves[i]); 
+        i++;
+    }
+
 }
