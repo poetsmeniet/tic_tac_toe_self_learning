@@ -1,11 +1,11 @@
 NAME1 = keeper
 NAME2 = client
-NAME3 = clientGameTree
+NAME3 = clientRandom 
 NAME4 = minimax 
 
 CODE_FILES1 = keeper.c
 CODE_FILES2 = client1.c
-CODE_FILES3 = clientGameTree.c
+CODE_FILES3 = clientRandom.c
 CODE_FILES4 = minimax.c
 
 DOC_FILES = docs
