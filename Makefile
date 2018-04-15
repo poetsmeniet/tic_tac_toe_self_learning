@@ -1,7 +1,7 @@
 NAME1 = keeper
-NAME2 = client
+NAME2 = clientBio
 NAME3 = clientRandom 
-NAME4 = minimax 
+NAME4 = clientmMinimax 
 
 CODE_FILES1 = keeper.c
 CODE_FILES2 = client1.c
