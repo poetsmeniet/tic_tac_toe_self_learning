@@ -1,5 +1,5 @@
 # tic_tac_toe_self_learning
-A self learning tic tac toe program using FANN and C
+A learning experience; tic tac toe program in C
 
 The design is set up thusly to accommodate easy plugin of new versions
 and includes a human interface to test skill against..
