@@ -3,9 +3,13 @@
 #include <sys/stat.h> 
 #include <fcntl.h> 
 #include <string.h> 
+#include <time.h> 
+#include <stdlib.h> 
 #include <unistd.h>
 #include "tictactoe.h"
-#define CLEAR() printf("\033[H\033[J") //to clear the linux term
+#define CLEAR() printf("\033[H\033[J") 
+
+/* A quick and non optimized version of minimax for tictactoe */
 
 void displayGame(gData *p, char player);
 
@@ -28,6 +32,7 @@ int selectBestMove(struct movesInfo *moves);
     
 int main(void)
 {
+    srand(time(NULL));
     
     char name[] = "/gameState";
     int smfd = shm_open (name, O_RDWR, 0660); 
@@ -69,11 +74,9 @@ int main(void)
     /* Main loop */
     while(1){
         char nextMove[10];
-        //Turn?
         if(p->playerTurn == player && p->lck){
             displayGame(p, player);
             
-            //char gameState[] = "XOX**O**X";
             char gameState[10];
             memcpy(gameState, p->game, 9);
             gameState[9] = '\0';
@@ -82,16 +85,16 @@ int main(void)
             /* Truncate moves.. */
             int j;
             for(j = 0; j < 9; j++){
-                moves[j].index = 0;
-                moves[j].score = 0;
+                moves[j].index = -1;
+                moves[j].score = -1;
             }
             /* Run minimax */
             miniMax(gameState, aiPlayer, moves);
             
             /* Select best move */
             int bestMove = selectBestMove(moves);
-            printf("Index chosen for best move: %d\n", bestMove);
             
+            /* Convert move to human readable form */
             if(bestMove == 0)
                 memcpy(nextMove, "a1", 2);
             else if(bestMove == 1)
@@ -111,23 +114,22 @@ int main(void)
             else if(bestMove == 8)
                 memcpy(nextMove, "c3", 2);
 
-            printf("nextMove selected: '%s'\n", nextMove);
-
-            p->lck = 0; //lock mem
+            /* Lock memory for use and set move to keeper */
+            p->lck = 0; 
             memcpy(p->nextMove, nextMove, 3);
             p->nextMove[2] = '\0';
 
             /* Truncate moves.. */
             int i;
             for(i = 0; i < 9; i++){
-                moves[i].index = 0;
-                moves[i].score = 0;
+                moves[i].index = -1;
+                moves[i].score = -1;
             }
 
         }else{
-            //displayGame(p, player);
+            displayGame(p, player);
         }
-        usleep(50000);
+        usleep(UDELAY);
     }
 
     munmap(&p, sizeof(gData));
@@ -183,12 +185,16 @@ int miniMax(char *gameState, char player, struct movesInfo *moves)
         return -1;
     else if(avMvCnt == 0)
         return 0;
+    else if(avMvCnt == 9){
+        int rnd = rand() % 9;
+        moves[avMoves[i]].index = rnd;
+        moves[avMoves[i]].score = 1000;
+        return 0;
+    }
     
     /* Loop over all available moves */
     while(avMoves[i] != -1)
     {
-        printf("avMove: %d, player: '%c', avMvCnt: %d\n", avMoves[i], player, avMvCnt); 
-        
         /* Store the index in movesInfo struct array */
         moves[avMoves[i]].index = avMoves[i];
 
@@ -197,7 +203,10 @@ int miniMax(char *gameState, char player, struct movesInfo *moves)
 
         int result;
 
-        //Recurse minimax and save scores
+        /* Recurse minimax and save scores
+         * In this version, scores are added or 
+         * substracted, resulting in best move
+         * with the highest score */
         if(player == aiPlayer){
             result = miniMax(gameState, bioPlayer, moves);
             moves[avMoves[i]].score -= result;
@@ -219,14 +228,12 @@ int miniMax(char *gameState, char player, struct movesInfo *moves)
 int selectBestMove(struct movesInfo *moves)
 {
     int i;
-    int currBest = 0;
+    int currBest = -1;
     int bestIndex;
     for(i = 0; i < 9; i++){
-        printf("move found: %d, index %d\n", moves[i].score, moves[i].index);
-        if(moves[i].score > currBest){
+        if(moves[i].score >= currBest && moves[i].index != -1){
             bestIndex = moves[i].index;
             currBest = moves[i].score;
-            printf("\tBest move found: %d, index %d\n", currBest, bestIndex);
         }
     }
 
@@ -236,7 +243,7 @@ int selectBestMove(struct movesInfo *moves)
 void displayGame(gData *p, char player)
 {
     CLEAR();
-    printf("Player: %c\n\n", player);
+    printf("Minimax player: %c\n\n", player);
 
     int i;
     int j = 9;
