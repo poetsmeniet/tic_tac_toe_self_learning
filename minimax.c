@@ -15,8 +15,8 @@ struct movesInfo{
 };
 
 /* Set whom is whom */
-char aiPlayer = 'O';
-char bioPlayer = 'X';
+char aiPlayer;
+char bioPlayer;
 
 int isWinning(char *gameState, char currPlayer);
 
@@ -60,6 +60,11 @@ int main(void)
         return 1;
     }
     printf("This instance is player %c\n", player);
+    aiPlayer = player;
+    if(aiPlayer == 'O')
+        bioPlayer = 'X';
+    else
+        bioPlayer = 'O';
 
     /* Main loop */
     while(1){
@@ -72,11 +77,15 @@ int main(void)
             char gameState[10];
             memcpy(gameState, p->game, 9);
             gameState[9] = '\0';
-            printf("!! copied gameState: '%s'. pointer gs: '%s'\n", gameState, p->game);
             struct movesInfo moves[9];
             
+            /* Truncate moves.. */
+            int j;
+            for(j = 0; j < 9; j++){
+                moves[j].index = 0;
+                moves[j].score = 0;
+            }
             /* Run minimax */
-            printf("calling minimax with gamestate: '%s'\n", gameState);
             miniMax(gameState, aiPlayer, moves);
             
             /* Select best move */
@@ -163,7 +172,7 @@ int returnAvailableMoves(char *gameState, int *avMoves)
 int miniMax(char *gameState, char player, struct movesInfo *moves)
 {
     /* Return available moves */
-    int avMoves[8];
+    int avMoves[9];
     int i = 0;
     int avMvCnt = returnAvailableMoves(gameState, avMoves);
     
@@ -178,7 +187,7 @@ int miniMax(char *gameState, char player, struct movesInfo *moves)
     /* Loop over all available moves */
     while(avMoves[i] != -1)
     {
-        //printf("avMove: %d\n", avMoves[i]); 
+        printf("avMove: %d, player: '%c', avMvCnt: %d\n", avMoves[i], player, avMvCnt); 
         
         /* Store the index in movesInfo struct array */
         moves[avMoves[i]].index = avMoves[i];
@@ -188,14 +197,14 @@ int miniMax(char *gameState, char player, struct movesInfo *moves)
 
         int result;
 
-        //Recurse minimax
-        if(player == aiPlayer)
+        //Recurse minimax and save scores
+        if(player == aiPlayer){
             result = miniMax(gameState, bioPlayer, moves);
-        else
+            moves[avMoves[i]].score -= result;
+        }else{
             result = miniMax(gameState, aiPlayer, moves);
-
-        /* Save score to struct */
-        moves[avMoves[i]].score += result;
+            moves[avMoves[i]].score += result;
+        }
 
         /* Reset the move */
         gameState[avMoves[i]] = '*';
@@ -221,14 +230,6 @@ int selectBestMove(struct movesInfo *moves)
         }
     }
 
-    /* If no best move, select first available move */
-    if(currBest == 0){
-        printf("Selecting next av move!!!!\n");
-        sleep(1);
-        for(i = 0; i < 9; i++)
-            if(moves[i].index > 0)
-                bestIndex = moves[i].index;
-    }
     return bestIndex;
 }
 
