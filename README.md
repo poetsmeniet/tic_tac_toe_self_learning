@@ -1,5 +1,6 @@
 # tic_tac_toe_self_learning
 A learning experience; tic tac toe program in C
+(check the wiki for animated gifs)
 
 The design is set up thusly to accommodate easy plugin of new versions
 and includes a human interface to test skill against..
