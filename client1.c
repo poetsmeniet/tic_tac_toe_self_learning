@@ -47,11 +47,10 @@ int main(void)
     while(1){
         char nextMove[10];
         //Turn?
-        if(p->playerTurn == player && p->lck){
+        if(p->playerTurn == player && p->nextMove[0] == '*'){
             displayGame(p, player);
             printf("Please make a move:\n?>");
             fgets(nextMove, 10, stdin);
-            p->lck = 0; //lock mem
             memcpy(p->nextMove, nextMove, 3);
             p->nextMove[2] = '\0';
         }else{
@@ -67,7 +66,6 @@ int main(void)
 void displayGame(gData *p, char player)
 {
     CLEAR();
-    printf("Player: %c, lck: %d, playerturn: '%c'\n\n", player, p->lck, p->playerTurn);
 
     int i;
     int j = 9;

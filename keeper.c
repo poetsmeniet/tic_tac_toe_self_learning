@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include "tictactoe.h"
 
-//gData *initGame(char *shmName);
 gData *initGame(char *shmName);
 int parseMove(gData *p);
 void newGame(gData *p);
@@ -19,13 +18,12 @@ int main(void)
 
     gData *p = initGame(shmName);
 
-    //parse moves
+    /* Parse client moves */
     while(1){
         if(p->nextMove[0] != '*'){
-            //Signal stop to clients
-            p->lck = 0; //Spurious
-
+            
             parseMove(p);
+
             memcpy(p->nextMove, "* \0", 3);
         }
 
@@ -62,15 +60,16 @@ gData *initGame(char *shmName)
         return NULL;
     }
 
-    //Initialise players to none
+    /* Initialize players to none */
     p->playerX = '*';
     p->playerO = '*';
 
     p->scoreX = 0;
     p->scoreO = 0;
     p->ties = 0;
+    memcpy(p->nextMove, "* \0", 3);
 
-    //Init new gameState
+    /* Init new gameState */
     newGame(p);
 
     return p;
@@ -82,21 +81,31 @@ int parseMove(gData *p)
     int row = p->nextMove[1] - '0';
 
     if(setMove(p, col, row) == 0){
-        printf("setmove returns 0\n");
-        p->lck = 1;
+        printf("Setmove returns 0, move not allowed, move not allow retry\n");
+    
         return 0;
     }
     
-    //Calculate draw
+    /* Calculate draw */
     int i;
     int e = 0;
 
-    for(i = 0; i < 10; i++){
+    for(i = 0; i < 8; i++){
         if(p->game[i] == '*')
-            e++;
+            ++e;
+    }
+    
+    /* Find tie */
+    if(e == 0){
+        printf("Draw.\n");
+        memcpy(p->bcastMsg, "Draw. A new game begins soon..\0", 36);
+        p->ties++;
+        usleep(UDELAY2);
+        newGame(p);
+        return 0;
     }
 
-    //Find a winner
+    /* Find a winner */
     if(findWinner(p->game) == 1){
         printf("X Wins.");
         memcpy(p->bcastMsg, "X wins this game! Starting new game..\0", 38);
@@ -114,31 +123,19 @@ int parseMove(gData *p)
         newGame(p);
         return 0;
     }
-    
-    //Find tie
-    if(e == 0){
-        printf("Draw. ");
-        memcpy(p->bcastMsg, "Draw! Tie! A new game begins soon..\0", 36);
-        p->ties++;
-        usleep(UDELAY2);
-        newGame(p);
-        return 0;
-    }
 
-    //Switch turn
+    /* Switch turns */
     if(p->playerTurn == 'X')
         p->playerTurn = 'O';
     else
         p->playerTurn = 'X';
-
-    p->lck = 1;
 
     return 0;
 }
 
 void newGame(gData *p)
 {
-    //Init new gameState
+    /* Init new gameState */
     memcpy(p->game, "*********\0", 10);
 
     p->playerTurn = 'X';
@@ -146,13 +143,13 @@ void newGame(gData *p)
     memcpy(p->nextMove, "* \0", 3);
     memcpy(p->bcastMsg, "Welcome to a new game\0", 22);
     p->winner = '*';
-    p->lck = 1;
-    
-    printf("Scores; X: %d, O: %d, ties: %d\n", \
-            p->scoreX, p->scoreO, p->ties);
+        
+    long int gamesPlayed = p->scoreX + p->scoreO + p->ties;
+    printf("Scores; X: %d, O: %d, ties: %d\t\tTotal games played: %li\n", \
+            p->scoreX, p->scoreO, p->ties, gamesPlayed);
 }
 
-/*returns int:
+/* Returns int:
  * 0: no winner (yet)
  * 1: X wins
  * 2: O wins */
@@ -200,13 +197,13 @@ int setMove(gData *p, char col, int row)
 
     memcpy(p->bcastMsg, "The game is afoot..\0", 21);
     
-    //Is move in range?
+    /* Is move in range? */
     if(col > 'c')
         validMv = 0;
     if(row > 3)
         validMv = 0;
 
-    //If possible, set the move
+    /* If possible, set the move */
     if(col == 'a' && row == 1 && p->game[0] == '*')
         p->game[0] = p->playerTurn;
     else if(col == 'a' && row == 2 && p->game[3] == '*')

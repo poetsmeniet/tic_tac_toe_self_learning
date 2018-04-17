@@ -1,11 +1,11 @@
 #ifndef tictactoe_H_
 #define tictactoe_H_
 
-#define UDELAY 100000 /* Delay between moves, humans may follow */
-#define UDELAY2 2000000 /* Delay between games,  humans may follow */
+//#define UDELAY 1000000 /* Delay between moves, humans may follow */
+//#define UDELAY2 2000000 /* Delay between games,  humans may follow */
 
-//#define UDELAY 5000 /* Delay between moves, ai speed for testing */
-//#define UDELAY2 1000 /* Delay between games,  ai speed for testing */
+#define UDELAY 0 /* Delay between moves, ai speed for testing */
+#define UDELAY2 0 /* Delay between games,  ai speed for testing */
 
 /* The game state:
  * * = empty 
@@ -18,7 +18,6 @@ typedef struct gameData{
     char playerO;
     char playerTurn;
     char nextMove[3];
-    int lck; //lck == 1: continue, else locked
     char bcastMsg[200];
     char winner;
     int scoreX;

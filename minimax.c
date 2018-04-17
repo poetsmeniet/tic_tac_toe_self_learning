@@ -71,10 +71,14 @@ int main(void)
     else
         bioPlayer = 'O';
 
+    /* Display once, save some terminal cpu */
+    int displayed = 0;
+
     /* Main loop */
     while(1){
         char nextMove[10];
-        if(p->playerTurn == player && p->lck){
+        if(p->playerTurn == player && p->nextMove[0] == '*'){
+
             displayGame(p, player);
             
             char gameState[10];
@@ -114,20 +118,22 @@ int main(void)
             else if(bestMove == 8)
                 memcpy(nextMove, "c3", 2);
 
-            /* Lock memory for use and set move to keeper */
-            p->lck = 0; 
             memcpy(p->nextMove, nextMove, 3);
             p->nextMove[2] = '\0';
-
+            
             /* Truncate moves.. */
             int i;
             for(i = 0; i < 9; i++){
                 moves[i].index = -1;
                 moves[i].score = -1;
             }
-
+            
+            displayed = 0;
         }else{
-            displayGame(p, player);
+            if(displayed == 0){
+                displayGame(p, player);
+                displayed = 1;
+            }
         }
         usleep(UDELAY);
     }

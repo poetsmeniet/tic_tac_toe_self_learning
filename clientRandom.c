@@ -52,12 +52,11 @@ int main(void)
     while(1){
         char nextMove[10];
         //Turn?
-        if(p->playerTurn == player && p->lck){
+        if(p->playerTurn == player && p->nextMove[0] == '*'){
             displayGame(p, player);
             
             selectRandomMove(p->game, nextMove);
 
-            p->lck = 0; //lock mem
             memcpy(p->nextMove, nextMove, 3);
             p->nextMove[2] = '\0';
         }else{
