@@ -4,13 +4,20 @@
 #include <fcntl.h> 
 #include <string.h> 
 #include <unistd.h>
+#include <time.h>
 #include "tictactoe.h"
 
 gData *initGame(char *shmName);
 int parseMove(gData *p);
-void newGame(gData *p);
+int newGame(gData *p);
 int findWinner(char *gameState);
 int setMove(gData *p, char col, int row);
+
+/* Some globals for the tps counter */
+int t1;
+int t2;
+int tpsCnt = 0;
+int tpsCntSum = 0;
 
 int main(void)
 {
@@ -70,6 +77,7 @@ gData *initGame(char *shmName)
     memcpy(p->nextMove, "* \0", 3);
 
     /* Init new gameState */
+    int t1 = time(NULL);
     newGame(p);
 
     return p;
@@ -100,7 +108,7 @@ int parseMove(gData *p)
         memcpy(p->bcastMsg, "Draw. A new game begins soon..\0", 36);
         p->ties++;
         usleep(UDELAY2);
-        newGame(p);
+        tpsCnt += newGame(p);
         return 0;
     }
 
@@ -110,14 +118,14 @@ int parseMove(gData *p)
         p->winner = 'X';
         p->scoreX++;
         usleep(UDELAY2);
-        newGame(p);
+        tpsCnt += newGame(p);
         return 0;
     }else if(findWinner(p->game) == 2){
         memcpy(p->bcastMsg, "O wins this game! Starting new game..\0", 38);
         p->winner = 'O';
         p->scoreO++;
         usleep(UDELAY2);
-        newGame(p);
+        tpsCnt += newGame(p);
         return 0;
     }
 
@@ -132,8 +140,21 @@ int parseMove(gData *p)
     return 0;
 }
 
-void newGame(gData *p)
+int newGame(gData *p)
 {
+    /* Calculate tps */
+    t2 = time(NULL);
+    if((t2 - t1) >= 1){
+        t1 = time(NULL);
+        tpsCntSum = tpsCnt;
+        tpsCnt = 0;
+    }
+        
+    /* Print scores and other stats */
+    long int gamesPlayed = p->scoreX + p->scoreO + p->ties;
+    printf("%s\tScores; X: %d, O: %d, ties: %d\t Game cnt: %li\ttpsCnt: %d\n", \
+            p->game, p->scoreX, p->scoreO, p->ties, gamesPlayed, tpsCntSum);
+
     /* Init new gameState */
     memcpy(p->game, "*********\0", 10);
 
@@ -142,10 +163,8 @@ void newGame(gData *p)
     memcpy(p->nextMove, "* \0", 3);
     memcpy(p->bcastMsg, "Welcome to a new game\0", 22);
     p->winner = '*';
-        
-    long int gamesPlayed = p->scoreX + p->scoreO + p->ties;
-    printf("Scores; X: %d, O: %d, ties: %d\t\tTotal games played: %li\n", \
-            p->scoreX, p->scoreO, p->ties, gamesPlayed);
+
+    return 1; 
 }
 
 /* Returns int:
