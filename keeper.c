@@ -97,7 +97,6 @@ int parseMove(gData *p)
     
     /* Find tie */
     if(e == 0){
-        printf("Draw.\n");
         memcpy(p->bcastMsg, "Draw. A new game begins soon..\0", 36);
         p->ties++;
         usleep(UDELAY2);
@@ -107,7 +106,6 @@ int parseMove(gData *p)
 
     /* Find a winner */
     if(findWinner(p->game) == 1){
-        printf("X Wins.");
         memcpy(p->bcastMsg, "X wins this game! Starting new game..\0", 38);
         p->winner = 'X';
         p->scoreX++;
@@ -115,7 +113,6 @@ int parseMove(gData *p)
         newGame(p);
         return 0;
     }else if(findWinner(p->game) == 2){
-        printf("O WINs. ");
         memcpy(p->bcastMsg, "O wins this game! Starting new game..\0", 38);
         p->winner = 'O';
         p->scoreO++;
@@ -129,6 +126,8 @@ int parseMove(gData *p)
         p->playerTurn = 'O';
     else
         p->playerTurn = 'X';
+    /* Reset nextMove */
+    memcpy(p->nextMove, "* \0", 3);
 
     return 0;
 }
