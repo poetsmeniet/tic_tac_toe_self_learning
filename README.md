@@ -25,3 +25,5 @@ Currently Done:
 Todo:
 - FANN self learning client
 - Other ANN frameworks possibly
+
+<img src="https://www.geenbs.nl/gifs/MinimaxVSRandom.gif">
